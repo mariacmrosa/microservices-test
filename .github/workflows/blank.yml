@@ -29,10 +29,10 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
 
-      - name: Verificar Existência do Arquivo mkt-node
-        id: verificar_mkt_node
+      - name: Verificar Existência do Arquivo index.ts
+        id: verificar_index_ts
         run: |
-          if find . -name 'index' -print -quit; then
+          if find . -name 'index.ts' -print -quit; then
             echo "::set-output name=existe::true"
             echo "Arquivo index encontrado."
           else
