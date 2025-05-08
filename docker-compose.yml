@@ -87,15 +87,24 @@ services:
       - rabbitmq
       - postgre-academico
     environment:
-      DB_DSN: pgsql:host=postgre-academico;dbname=academico;port=5432
-      DB_USERNAME: usuario_academico
-      DB_PASSWORD: senhapg
-      RABBITMQ_HOST: 'rabbitmq'
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
-      GMAIL_USER: 'seu-email@gmail.com'
-      GMAIL_PASSWORD: 'sua-senha'
+#      DB_DSN: pgsql:host=postgre-academico;dbname=academico;port=5432
+#      DB_USERNAME: usuario_academico
+#      DB_PASSWORD: senhapg
+#      RABBITMQ_HOST: 'rabbitmq'
+#      RABBITMQ_PORT: 5672
+#      RABBITMQ_USERNAME: guest
+#      RABBITMQ_PASSWORD: guest
+#      GMAIL_USER: 'seu-email@gmail.com'
+#      GMAIL_PASSWORD: 'sua-senha'
+      - DB_DSN
+      - DB_USERNAME
+      - DB_PASSWORD
+      - RABBITMQ_HOST
+      - RABBITMQ_PORT
+      - RABBITMQ_USERNAME
+      - RABBITMQ_PASSWORD
+      - GMAIL_USER
+      - GMAIL_PASSWORD
 
   postgre-academico:
     image: postgres
