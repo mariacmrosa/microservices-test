@@ -33,8 +33,10 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - rabbitmq
-      - mongo-mkt
+      rabbitmq:
+        condition: service_started
+      mongo-mkt:
+        condition: service_healthy
 
   mongo-mkt:
     image: mongo
@@ -42,6 +44,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mkt-usuario
       MONGO_INITDB_ROOT_PASSWORD: mkt-senha
       MONGO_INITDB_DATABASE: mkt
+    healthcheck: # Seção de verificação de saúde
+      # O comando abaixo tenta executar um 'ping' no servidor MongoDB.
+      # Ele roda dentro do contêiner mongo-mkt.
+      # Sai com código 0 (sucesso) se o ping for bem-sucedido.
+      test: [ "CMD", "mongosh", "--host", "localhost", "--port", "27017", "--eval", "db.adminCommand('ping')", "--quiet" ]
+      interval: 10s       # Verifica a cada 10 segundos
+      timeout: 5s         # Espera 5 segundos para o comando 'test' responder
+      retries: 6          # Tenta 6 vezes antes de marcar como 'unhealthy'
+      start_period: 60s
 
   rabbitmq:
     image: rabbitmq
@@ -60,7 +71,8 @@ services:
         target: /app/entrypoint.sh
     working_dir: /app
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_started
 
   api-gateway:
     image: nginx
@@ -84,8 +96,11 @@ services:
     working_dir: /app
     command: sh ./entrypoint.sh
     depends_on:
-      - rabbitmq
-      - postgre-academico
+      rabbitmq:
+        condition: service_started
+      postgre-academico:
+        condition: service_healthy
+
     environment:
 #      DB_DSN: pgsql:host=postgre-academico;dbname=academico;port=5432
 #      DB_USERNAME: usuario_academico
@@ -112,6 +127,11 @@ services:
       POSTGRES_PASSWORD: senhapg
       POSTGRES_USER: usuario_academico
       POSTGRES_DB: academico
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U usuario_academico -d academico" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   web-academico:
     build: ./academico-php-web
@@ -136,4 +156,6 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - postgre-academico
+      postgre-academico:
+        condition: service_healthy
+
